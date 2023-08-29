@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "healthy-habits-tracker"
+version = "0.1.0"
+description = ""
+authors = ["Alexandr Abramov <https://github.com/Abramov0Alexandr>"]
+readme = "README.md"
+packages = [{include = "healthy_habits_tracker"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+django = "^4.2.4"
+djangorestframework = "^3.14.0"
+
+
+[tool.poetry.group.dev.dependencies]
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.7"
+ipython = "^8.14.0"
+djangorestframework-simplejwt = "^5.2.2"
+coverage = "^7.3.0"
+drf-yasg = "^1.21.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
