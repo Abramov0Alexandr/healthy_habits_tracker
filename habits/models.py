@@ -35,7 +35,7 @@ class Habit(models.Model):
 
     reward = models.CharField(max_length=255, **NULLABLE, verbose_name='Вознаграждение')  # Вознаграждение
 
-    duration = models.DurationField(verbose_name='Длительность выполнения')  # Время на выполнение в минутах
+    duration = models.DurationField(verbose_name='Длительность выполнения')  # Время на выполнение в секундах
 
     is_public = models.BooleanField(default=False, verbose_name='Признак публичности')  # Признак публичности
 
