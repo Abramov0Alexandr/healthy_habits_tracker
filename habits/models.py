@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
 
 
 NULLABLE = {'null': True, 'blank': True}
@@ -28,8 +30,7 @@ class Habit(models.Model):
 
     related_habit = models.ForeignKey(
         'self', on_delete=models.SET_NULL, **NULLABLE,
-        related_name='main_habit', limit_choices_to={'is_pleasure': True},
-        verbose_name="связанная привычка")  # Связанная привычка
+        related_name='main_habit', verbose_name='связанная привычка')  # Связанная привычка
 
     periodicity = models.PositiveIntegerField(default=1, choices=PERIODICITY_CHOICES, verbose_name='Периодичность')
 
@@ -46,3 +47,16 @@ class Habit(models.Model):
         verbose_name = 'Привычка'
         verbose_name_plural = 'Привычки'
         ordering = ('pk',)
+
+    def save(self, *args, **kwargs):
+        if not (self.is_pleasure or self.reward):
+            raise ValidationError(
+                {
+                    'message': "Вы должны добавить связанную приятную привычку ('related_habit') "
+                               "или указать награду ('reward')",
+                    'status': status.HTTP_400_BAD_REQUEST
+                },
+            )
+
+        super().save(*args, **kwargs)
+
