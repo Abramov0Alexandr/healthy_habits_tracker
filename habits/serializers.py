@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from habits.models import Habit
+from habits.validators import DurationValidator, RelatedHabitAndRewardValidator, PleasureHabitValidator
 
 
 class HabitsCreateSerializers(serializers.ModelSerializer):
@@ -14,18 +15,8 @@ class HabitsCreateSerializers(serializers.ModelSerializer):
     class Meta:
         model = Habit
         fields = '__all__'
-        # fields = ('user', 'place', 'time', 'action', 'is_pleasure', 'related_habit',
-        #           'periodicity', 'reward',)
-
-
-class HabitsListSerializers(serializers.ModelSerializer):
-    """
-    Сериализатор модели CustomUser.
-    Используется при вызове GET запросов в контроллере HabitsListView
-    """
-
-    user = serializers.CharField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = Habit
-        fields = '__all__'
+        validators = [
+            DurationValidator(field='duration'),
+            RelatedHabitAndRewardValidator(),
+            PleasureHabitValidator(field='is_pleasure'),
+        ]
