@@ -11,6 +11,15 @@ class HabitsCreateView(generics.CreateAPIView):
 
     serializer_class = HabitsCreateSerializers
 
+    def perform_create(self, serializer):
+        """
+        Метод для автоматического определения текущего пользователя и заполнения поля 'lesson_owner'
+        """
+
+        new_habit = serializer.save(user=self.request.user)
+        new_habit.lesson_owner = self.request.user
+        new_habit.save()
+
 
 class HabitsListView(generics.ListAPIView):
     """
