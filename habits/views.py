@@ -1,6 +1,8 @@
 from rest_framework import generics
+from rest_framework.permissions import AllowAny
 from habits.models import Habit
-from habits.serializers import HabitsCreateSerializers
+from habits.permissions import IsHabitCreator
+from habits.serializers import HabitsSerializers
 
 
 class HabitsCreateView(generics.CreateAPIView):
@@ -9,7 +11,8 @@ class HabitsCreateView(generics.CreateAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsCreateSerializers
+    serializer_class = HabitsSerializers
+    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         """
@@ -27,8 +30,11 @@ class HabitsListView(generics.ListAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsCreateSerializers
-    queryset = Habit.objects.all()
+    serializer_class = HabitsSerializers
+
+    def get_queryset(self):
+
+        return Habit.objects.filter(user=self.request.user)
 
 
 class PublicHabitsListView(generics.ListAPIView):
@@ -37,7 +43,7 @@ class PublicHabitsListView(generics.ListAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsCreateSerializers
+    serializer_class = HabitsSerializers
     queryset = Habit.objects.filter(is_public=True)
 
 
@@ -47,8 +53,9 @@ class HabitsUpdateView(generics.UpdateAPIView):
     Вызывается при PUT/PATCH запросах.
     """
 
-    serializer_class = HabitsCreateSerializers
+    serializer_class = HabitsSerializers
     queryset = Habit.objects.all()
+    permission_classes = [IsHabitCreator]
 
 
 class HabitsDeleteView(generics.DestroyAPIView):
@@ -58,4 +65,4 @@ class HabitsDeleteView(generics.DestroyAPIView):
     """
 
     queryset = Habit.objects.all()
-
+    permission_classes = [IsHabitCreator]
