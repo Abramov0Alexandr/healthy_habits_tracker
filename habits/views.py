@@ -1,6 +1,6 @@
 from rest_framework import generics
-from habits.serializers import HabitsListSerializers, HabitsCreateSerializers
 from habits.models import Habit
+from habits.serializers import HabitsCreateSerializers
 
 
 class HabitsCreateView(generics.CreateAPIView):
@@ -18,7 +18,7 @@ class HabitsListView(generics.ListAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsListSerializers
+    serializer_class = HabitsCreateSerializers
     queryset = Habit.objects.all()
 
 
@@ -38,7 +38,7 @@ class HabitsUpdateView(generics.UpdateAPIView):
     Вызывается при PUT/PATCH запросах.
     """
 
-    serializer_class = HabitsListSerializers
+    serializer_class = HabitsCreateSerializers
     queryset = Habit.objects.all()
 
 
