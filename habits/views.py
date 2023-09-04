@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from habits.models import Habit
+from habits.pagination import CustomPaginationClass
 from habits.permissions import IsHabitCreator
 from habits.serializers import HabitsSerializers
 
@@ -31,6 +32,7 @@ class HabitsListView(generics.ListAPIView):
     """
 
     serializer_class = HabitsSerializers
+    pagination_class = CustomPaginationClass
 
     def get_queryset(self):
 
@@ -44,6 +46,7 @@ class PublicHabitsListView(generics.ListAPIView):
     """
 
     serializer_class = HabitsSerializers
+    pagination_class = CustomPaginationClass
     queryset = Habit.objects.filter(is_public=True)
 
 
