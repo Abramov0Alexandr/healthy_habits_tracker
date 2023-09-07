@@ -28,8 +28,11 @@ class DurationValidator:
 class RelatedHabitAndRewardValidator:
     """
     Класс для валидации полей 'related_habit' и 'reward'.
+
     Валидатор проверяет, недопустимость одновременного заполнения полей 'related_habit' и 'reward'.
-    Валидатор проверяет, что связанная привычка 'related_habit' имеет положительный флаг 'is_pleasure'.
+
+    Валидатор проверяет, что хотя бы одно поле из необязательных ('related_habit' и 'reward')
+    заполнено при создании нового экземпляра
     """
 
     def __call__(self, value):
@@ -44,41 +47,68 @@ class RelatedHabitAndRewardValidator:
                 }
             )
 
-        if related_habit and not related_habit.is_pleasure:
+        if not related_habit and not reward:
             raise ValidationError(
                 {
-                    'message': "Связанная привычка должна быть приятной.",
+                    'message': "Вы должны добавить связанную приятную привычку ('related_habit') "
+                               "или указать награду ('reward')",
                     'status': status.HTTP_400_BAD_REQUEST
-                }
+                },
             )
 
 
-class PleasureHabitValidator:
+class RequiredFieldsValidator:
     """
-    Класс для валидации полей 'related_habit' и 'reward' у связанной (приятной) привычки.
-    Валидатор проверяет, недопустимость заполнения поля 'reward' или указания связанной привычки.
+    Класс для валидации полей у связанной привычки.
+
+    Исключение возбуждается в следующих случаях:
+    - у связанной привычки не указан флаг 'is_pleasure'
+    - у связанной привычки указана награда
+    - у связанной привычки указан положительный признак публичности
+    - у связанной привычки уже имеется связанная привычка
     """
 
     def __init__(self, field):
         self.field = field
 
     def __call__(self, value):
-        is_pleasure = value.get(self.field)
-        related_habit = value.get('related_habit')
-        reward = value.get('reward')
+        related_habit = value.get(self.field)
 
-        if is_pleasure:
-            if related_habit:
+        if related_habit:
+
+            if not related_habit.is_pleasure:
                 raise ValidationError(
                     {
-                        'message': "У приятной привычки не может быть связанной привычки.",
+                        'message': "Связанная привычка должна быть приятной (is_pleasure=True)",
                         'status': status.HTTP_400_BAD_REQUEST
-                    }
+                    },
                 )
-            if reward:
+
+            if related_habit.reward:
                 raise ValidationError(
                     {
-                        'message': "У приятной привычки не может быть указано вознаграждение.",
+                        'message': "У связанной приятной привычки не может быть награды",
                         'status': status.HTTP_400_BAD_REQUEST
-                    }
+                    },
                 )
+
+            if related_habit.is_public:
+                raise ValidationError(
+                    {
+                        'message': "Не допускается использовать публичные привычки",
+                        'status': status.HTTP_400_BAD_REQUEST
+                    },
+                )
+
+            if related_habit.related_habit:
+                raise ValidationError(
+                    {
+                        'message': "У связанной приятной привычки не может быть указана еще одна привычка",
+                        'status': status.HTTP_400_BAD_REQUEST
+                    },
+                )
+
+
+
+
+

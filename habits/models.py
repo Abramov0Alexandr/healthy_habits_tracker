@@ -47,16 +47,3 @@ class Habit(models.Model):
         verbose_name = 'Привычка'
         verbose_name_plural = 'Привычки'
         ordering = ('pk',)
-
-    def save(self, *args, **kwargs):
-        if not (self.is_pleasure or self.reward):
-            raise ValidationError(
-                {
-                    'message': "Вы должны добавить связанную приятную привычку ('related_habit') "
-                               "или указать награду ('reward')",
-                    'status': status.HTTP_400_BAD_REQUEST
-                },
-            )
-
-        super().save(*args, **kwargs)
-

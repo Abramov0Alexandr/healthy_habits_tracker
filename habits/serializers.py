@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from habits.models import Habit
-from habits.validators import DurationValidator, RelatedHabitAndRewardValidator, PleasureHabitValidator
+from habits.validators import DurationValidator, RelatedHabitAndRewardValidator, RequiredFieldsValidator
 
 
 class HabitsSerializers(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class HabitsSerializers(serializers.ModelSerializer):
     """
 
     user = serializers.CharField(default=serializers.CurrentUserDefault(), read_only=True)
-    periodicity = serializers.ChoiceField(choices=Habit.PERIODICITY_CHOICES, source='get_periodicity_display')
+    periodicity = serializers.ChoiceField(choices=Habit.PERIODICITY_CHOICES, source='get_periodicity_display', read_only=True)
 
     class Meta:
         model = Habit
@@ -20,5 +20,5 @@ class HabitsSerializers(serializers.ModelSerializer):
         validators = [
             DurationValidator(field='duration'),
             RelatedHabitAndRewardValidator(),
-            PleasureHabitValidator(field='is_pleasure'),
+            RequiredFieldsValidator(field='related_habit')
         ]

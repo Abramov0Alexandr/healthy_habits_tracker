@@ -1,5 +1,4 @@
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
 from habits.models import Habit
 from habits.pagination import CustomPaginationClass
 from habits.permissions import IsHabitCreator
@@ -13,7 +12,6 @@ class HabitsCreateView(generics.CreateAPIView):
     """
 
     serializer_class = HabitsSerializers
-    permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         """
