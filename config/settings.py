@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',  #: Безопасность браузера
     'rest_framework',    #: DRF
     'rest_framework_simplejwt',  #: JWT токен
+    'django_celery_beat',  #: Celery-beat для выполнения периодических задач
 
     'custom_user.apps.CustomUserConfig',
     'habits.apps.HabitsConfig',
@@ -189,3 +190,35 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://docs.djangoproject.com/en/4.2/topics/auth/customizing/
 
 AUTH_USER_MODEL = 'custom_user.CustomUser'
+
+
+TG_ACCESS_TOKEN = os.getenv('TG_ACCESS_TOKEN')
+
+
+# https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html#id1
+# Using Celery with Django
+
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = os.getenv('TIME_ZONE_SETTINGS')
+
+# Флаг отслеживания выполнения задач
+CELERY_TASK_TRACK_STARTED = True
+
+# Максимальное время на выполнение задачи
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+
+# URL-адрес брокера сообщений
+# Например, Redis, который по умолчанию работает на порту 6379
+CELERY_BROKER_URL = 'redis://localhost:6379'
+
+# URL-адрес брокера результатов, также Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+
+CELERY_BEAT_SCHEDULE = {
+    "check_habit_execution_time": {
+        "task": "habits.tasks.check_habit_execution_time",
+        "schedule": timedelta(minutes=1),
+    },
+}
