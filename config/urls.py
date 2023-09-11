@@ -23,10 +23,9 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="LMS project API",
+      title="Healthy habits tracker API",
       default_version='v1',
-      description="Description for LMS project. "
-                  "Here you can find all the information about requests and check them",
+      description="Here you can find all the information about requests and check them",
       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(url="https://github.com/Abramov0Alexandr"),
       license=openapi.License(name="BSD License"),
