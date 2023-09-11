@@ -5,7 +5,7 @@ from rest_framework.serializers import ValidationError
 
 class DurationValidator:
     """
-    Класс для валидации поля 'duration' и 'reward'.
+    Класс для валидации поля 'duration' у основной и связанной привычки.
     При указании длительности выполнения привычки свыше 120 секунд возбуждается ошибка.
     """
 
@@ -13,10 +13,13 @@ class DurationValidator:
         self.field = field
 
     def __call__(self, value):
-        duration = value.get(self.field, timedelta())
-        total_duration_in_sec = duration.total_seconds()
 
-        if total_duration_in_sec > 120:
+        related_habit = value.get('related_habit')
+
+        main_habit_duration = value.get(self.field, timedelta())
+        main_habit_duration_in_sec = main_habit_duration.total_seconds()
+
+        if main_habit_duration_in_sec > 120:
             raise ValidationError(
                 {
                     'message': "Время выполнения привычки не может превышать 120 секунд.",
@@ -24,91 +27,59 @@ class DurationValidator:
                 }
             )
 
+        if related_habit:
 
-class RelatedHabitAndRewardValidator:
+            related_habit_duration = related_habit.get(self.field, timedelta())
+            related_habit_duration_in_sec = related_habit_duration.total_seconds()
+
+            if main_habit_duration_in_sec > 120 or related_habit_duration_in_sec > 120:
+                raise ValidationError(
+                    {
+                        'message': "Время выполнения привычки не может превышать 120 секунд.",
+                        'status': status.HTTP_400_BAD_REQUEST
+                    }
+                )
+
+
+class InitialInstanceFieldsValidator:
     """
-    Класс для валидации полей 'related_habit' и 'reward'.
+    Класс для валидации заполнения полей при создании экземпляра модели Привычка.
 
-    Валидатор проверяет, недопустимость одновременного заполнения полей 'related_habit' и 'reward'.
-
-    Валидатор проверяет, что хотя бы одно поле из необязательных ('related_habit' и 'reward')
-    заполнено при создании нового экземпляра
+    Кейсы, при которых происходит вызов ошибки 'ValidationError':
+        - в случае, если указывается положительный флаг 'is_pleasure' у основной привычки
+        - в случае, если привычка не является публичной и у нее отсутствует информации о награде или связанной привычке
+        - в случае, если одновременно указать награду и связанную привычку
     """
 
     def __call__(self, value):
+        is_pleasure_habit = value.get('is_pleasure')
         related_habit = value.get('related_habit')
         reward = value.get('reward')
 
-        if related_habit and reward:
+        if is_pleasure_habit:
+
             raise ValidationError(
                 {
-                    'message': "Не допускается одновременное указание приятной привычки и вознаграждения.",
+                    'message': "Недопустимо указывать признак приятной привычки у основной привычки",
                     'status': status.HTTP_400_BAD_REQUEST
                 }
             )
 
-        if not related_habit and not reward:
+        if not value.get('is_public'):
+            if not (related_habit or reward):
+
+                raise ValidationError(
+                    {
+                        'message': "Вы должны добавить связанную приятную привычку ('related_habit') "
+                                   "или указать награду ('reward')",
+                        'status': status.HTTP_400_BAD_REQUEST
+                    },
+                )
+
+        if related_habit and reward:
             raise ValidationError(
                 {
-                    'message': "Вы должны добавить связанную приятную привычку ('related_habit') "
-                               "или указать награду ('reward')",
+                    'message': "Не допускается одновременное указание награды и связанной привычки.",
                     'status': status.HTTP_400_BAD_REQUEST
-                },
+                }
             )
-
-
-class RequiredFieldsValidator:
-    """
-    Класс для валидации полей у связанной привычки.
-
-    Исключение возбуждается в следующих случаях:
-    - у связанной привычки не указан флаг 'is_pleasure'
-    - у связанной привычки указана награда
-    - у связанной привычки указан положительный признак публичности
-    - у связанной привычки уже имеется связанная привычка
-    """
-
-    def __init__(self, field):
-        self.field = field
-
-    def __call__(self, value):
-        related_habit = value.get(self.field)
-
-        if related_habit:
-
-            if not related_habit.is_pleasure:
-                raise ValidationError(
-                    {
-                        'message': "Связанная привычка должна быть приятной (is_pleasure=True)",
-                        'status': status.HTTP_400_BAD_REQUEST
-                    },
-                )
-
-            if related_habit.reward:
-                raise ValidationError(
-                    {
-                        'message': "У связанной приятной привычки не может быть награды",
-                        'status': status.HTTP_400_BAD_REQUEST
-                    },
-                )
-
-            if related_habit.is_public:
-                raise ValidationError(
-                    {
-                        'message': "Не допускается использовать публичные привычки",
-                        'status': status.HTTP_400_BAD_REQUEST
-                    },
-                )
-
-            if related_habit.related_habit:
-                raise ValidationError(
-                    {
-                        'message': "У связанной приятной привычки не может быть указана еще одна привычка",
-                        'status': status.HTTP_400_BAD_REQUEST
-                    },
-                )
-
-
-
-
-

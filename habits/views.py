@@ -1,8 +1,9 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAdminUser
 from habits.models import Habit
 from habits.pagination import CustomPaginationClass
 from habits.permissions import IsHabitCreator
-from habits.serializers import HabitsSerializers
+from habits.serializers import HabitsCreateSerializers, HabitsListSerializers
 
 
 class HabitsCreateView(generics.CreateAPIView):
@@ -11,15 +12,15 @@ class HabitsCreateView(generics.CreateAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsSerializers
+    serializer_class = HabitsCreateSerializers
 
     def perform_create(self, serializer):
         """
-        Метод для автоматического определения текущего пользователя и заполнения поля 'lesson_owner'
+        Метод для автоматического определения текущего пользователя и заполнения поля 'creator'
         """
 
         new_habit = serializer.save(user=self.request.user)
-        new_habit.lesson_owner = self.request.user
+        new_habit.user = self.request.user
         new_habit.save()
 
 
@@ -29,10 +30,13 @@ class HabitsListView(generics.ListAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsSerializers
+    serializer_class = HabitsListSerializers
     pagination_class = CustomPaginationClass
 
     def get_queryset(self):
+
+        if self.request.user.is_superuser:
+            return Habit.objects.all()
 
         return Habit.objects.filter(user=self.request.user)
 
@@ -43,7 +47,7 @@ class PublicHabitsListView(generics.ListAPIView):
     Вызывается при GET запросах.
     """
 
-    serializer_class = HabitsSerializers
+    serializer_class = HabitsListSerializers
     pagination_class = CustomPaginationClass
     queryset = Habit.objects.filter(is_public=True)
 
@@ -54,9 +58,9 @@ class HabitsUpdateView(generics.UpdateAPIView):
     Вызывается при PUT/PATCH запросах.
     """
 
-    serializer_class = HabitsSerializers
+    serializer_class = HabitsCreateSerializers
     queryset = Habit.objects.all()
-    permission_classes = [IsHabitCreator]
+    permission_classes = [IsHabitCreator | IsAdminUser]
 
 
 class HabitsDeleteView(generics.DestroyAPIView):
@@ -66,4 +70,4 @@ class HabitsDeleteView(generics.DestroyAPIView):
     """
 
     queryset = Habit.objects.all()
-    permission_classes = [IsHabitCreator]
+    permission_classes = [IsHabitCreator | IsAdminUser]
