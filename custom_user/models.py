@@ -13,7 +13,6 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True, verbose_name='Email')
     phone = models.CharField(max_length=20, verbose_name='Телефон', **NULLABLE)
     tg_username = models.CharField(max_length=50, unique=True, verbose_name='TG username')
-    tg_chat_id = models.CharField(max_length=50, unique=True, verbose_name='TG chat-ID', **NULLABLE)
     is_active = models.BooleanField(default=True, verbose_name='Статус активации')
 
     objects = CustomUserManager()

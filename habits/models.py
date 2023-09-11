@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
 
 
 NULLABLE = {'null': True, 'blank': True}
@@ -39,6 +37,8 @@ class Habit(models.Model):
     duration = models.DurationField(verbose_name='Длительность выполнения')  # Время на выполнение в секундах
 
     is_public = models.BooleanField(default=False, verbose_name='Признак публичности')  # Признак публичности
+
+    objects = models.Manager()
 
     def __str__(self):
         return self.action
