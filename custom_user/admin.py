@@ -4,5 +4,5 @@ from custom_user.models import CustomUser
 
 @admin.register(CustomUser)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'tg_username', 'tg_chat_id', )
+    list_display = ('email', 'tg_username',)
     list_display_links = ('email', )
