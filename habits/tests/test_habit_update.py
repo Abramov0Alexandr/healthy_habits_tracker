@@ -37,13 +37,13 @@ class HabitUpdateTestCase(APITestCase):
             "reward": "Новая тестовая награда"
         }
 
-        response = self.client.patch('/habits/update/1/', data=changed_data)
+        response = self.client.patch(f'/habits/update/{self.habit.id}/', data=changed_data)
         self.maxDiff = None
 
         self.assertEqual(
             response.json(),
             {
-                "id": 1,
+                "id": self.habit.id,
                 "user": "user@email.dot",
                 "related_habit": None,
                 "place": "Новое измененное место",

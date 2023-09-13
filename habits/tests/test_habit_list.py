@@ -54,7 +54,7 @@ class HabitListTestCase(APITestCase):
                 'results':
                     [
                         {
-                            'id': 6,
+                            'id': self.private_habit.id,
                             'user': 'user@email.dot',
                             'periodicity': 'Каждые понедельник, среда, пятница',
                             'related_habit': None,
@@ -67,7 +67,7 @@ class HabitListTestCase(APITestCase):
                             'is_public': False
                         },
                         {
-                            'id': 7,
+                            'id': self.public_habit.id,
                             'user': 'user@email.dot',
                             'periodicity': 'Каждые понедельник, среда, пятница',
                             'related_habit': None,
@@ -102,7 +102,7 @@ class HabitListTestCase(APITestCase):
                 'results':
                     [
                         {
-                            'id': 9,
+                            'id': self.public_habit.id,
                             'user': 'user@email.dot',
                             'periodicity': 'Каждые понедельник, среда, пятница',
                             'related_habit': None,
