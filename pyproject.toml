@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["Alexandr Abramov <https://github.com/Abramov0Alexandr>"]
 readme = "README.md"
-packages = [{include = "healthy_habits_tracker"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
