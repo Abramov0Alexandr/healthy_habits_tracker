@@ -43,7 +43,7 @@ class HabitCreateTestCase(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                "id": 3,
+                "id": 8,
                 "user": "user@email.dot",
                 "related_habit": None,
                 "place": "Тестовое место",
@@ -89,7 +89,7 @@ class HabitCreateTestCase(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                "id": 2,
+                "id": 7,
                 "user": "user@email.dot",
                 "related_habit": {
                     "place": "Тестовое место связанной привычки",
@@ -132,7 +132,7 @@ class HabitCreateTestCase(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                'id': 4,
+                'id': 9,
                 'user': 'user@email.dot',
                 'related_habit': None,
                 'place': 'Тестовое место',
